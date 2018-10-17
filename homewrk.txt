@@ -1,0 +1,34 @@
+
+classes
+--
+code string
+name string
+description string
+professor_id_fk int fk - professor.id
+
+professor
+--
+id int pk autoincrement
+name string
+department enum('SCIENCE','HUMANITIES','MUSIC','JOURNALISM','HISTORY','MEDICINE')
+tenure tinyint(1)
+date_started_work date
+
+
+students
+--
+id int pk autoincrement
+name string
+date_of_birth date
+date_of_register timestamp DEFAULT=CURRENT_TIMESTAMP
+status enum('CURRENT','WAITTING','PASSED','FAILED')
+
+students_classes
+--
+id int pk autoincrement
+students_id_fk int fk >- students.id
+classes_id_fk char fk >- classes.code
+professor_id_fk int fk >- professor.id
+date_class_started date
+date_class_end date
+grade int

@@ -1,0 +1,81 @@
+1.Based on a Student ID, display a list of all the classes taken and grades for each class.
+
+SELECT A.id, B.classes_id_fk, B.grade
+FROM students A
+JOIN students_classes B
+ON A.id = B.students_id_fk
+ORDER BY A.id
+
+2.Display a list of all graduate students (the ones who has finished all classes)
+
+
+SELECT B.name, A.students_id_fk, COUNT(A.classes_id_fk) AS total, AVG(A.grade)
+FROM students_classes A
+JOIN students B
+ON A.students_id_fk = B.id
+WHERE A.grade <> 'null'
+AND A.date_class_end <> '0000-00-00'
+GROUP BY A.students_id_fk
+HAVING total = 10
+
+3.Based on a Faculty ID, display a list of all the courses he or she has taught and 
+the number of times taught and sorted by the ones taught the most.
+
+SELECT A.id,B.code ,COUNT(A.classes_id_fk) AS Total_count
+FROM students_classes A
+JOIN classes B 
+JOIN professor C
+ON A.classes_id_fk = B.code
+AND C.id = A.professor_id_FK
+GROUP BY A.classes_id_fk,A.professor_id_FK
+ORDER BY Total_count DESC
+
+4.Display a list of all the student’s name and GPA, starting by the greatest GPAs.
+
+SELECT A.id, A.name, AVG(c.grade) AS average,
+IF(grade>90,'4.0',IF(grade>80,'3.0',IF(grade>70,'2.0','1.0'))) AS GPA
+FROM students A
+JOIN students_classes C
+ON A.id = C.students_id_fk
+WHERE grade <> 'null'
+GROUP BY A.id
+ORDER BY GPA DESC
+
+5.Get the current class and professor’s name and age for all students who are in the program 
+for less than three months, starting by the most recent students.
+
+SELECT B.name AS professor_name, C.name AS course_name, (2018-YEAR(D.date_of_birth)) AS age_of_students
+FROM students_classes A
+JOIN professor B
+ON A.professor_id_fk = B.id
+JOIN classes C
+ON A.classes_id_fk = C.code
+JOIN students D
+ON A.students_id_fk = D.id
+WHERE A.date_class_end = '0000-00-00'
+AND D.date_of_register > DATE_SUB(NOW(), INTERVAL 3 MONTH)
+ORDER BY D.date_of_register
+
+6.Display the professor name, tenure and current class, grouped by the professor’s department.
+
+SELECT B.name, B.tenure, A.classes_id_fk
+FROM students_classes A
+JOIN professor B
+ON A.professor_id_fk = B.id
+WHERE date_class_end = '0000-00-00'
+GROUP BY B.department
+
+7.Display name, description and current professor for all the classes offered 
+(the ones having at least one student registered).
+
+SELECT C.name AS class_name, C.description AS class_description, D.name AS professor_name, COUNT(B.id) AS total_students
+FROM students_classes A
+JOIN students B
+ON A.students_id_fk = B.id
+JOIN classes C
+ON A.classes_id_fk = C.code
+JOIN professor D
+ON A.professor_id_fk = D.id
+GROUP BY B.id
+HAVING total_students > 0
+
